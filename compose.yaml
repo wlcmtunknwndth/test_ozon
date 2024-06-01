@@ -1,0 +1,38 @@
+services:
+  server:
+    build:
+      context: .
+      target: final
+    environment:
+      - config_path =/var/service_config/config.yaml
+    ports:
+      - "63342:63342"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres
+    restart: always
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGUSER=postgres
+    ports:
+      - "5432:5432"
+    networks: ["service"]
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  db:
+    driver: local
+  data:
+    driver: local

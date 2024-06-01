@@ -1,0 +1,61 @@
+type Post{
+    id: ID!
+    author: String!
+    name: String!
+    description: String
+    content: String!
+    comments_allowed: Boolean!
+    createdAt: Timestamp!
+    updatedAt: Timestamp
+}
+
+type Comment{
+    id: ID!
+    post_id: ID!
+    # Replied comment id
+    replies_to: ID!
+    author: String!
+    text: String!
+    createdAt: Timestamp!
+    updatedAt: Timestamp
+}
+
+type User{
+    username: String!
+    password: String!
+    isAdmin: Boolean!
+}
+
+input NewPost{
+    author: String!
+    name: String!
+    description: String
+    content: String!
+    comments_allowed: Boolean!
+}
+
+input NewComment{
+    author: String!
+    post_id: ID!
+    replies_to: ID!
+    text: String!
+}
+
+input NewUser{
+    username: String!
+    password: String!
+}
+
+type Mutation{
+    createPost(input: NewPost): Post!
+    createComment(input: NewComment): Comment!
+    createUser(input: NewUser): User!
+    loginUser(input: NewUser): User!
+}
+
+type Query{
+    Posts(limit: Int = 25, offset: Int = 0): [Post!]!
+    Comments(post_id: ID): [Comment!]!
+}
+
+scalar Timestamp
