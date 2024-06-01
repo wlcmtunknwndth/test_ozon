@@ -3,9 +3,9 @@
 package model
 
 type Comment struct {
-	ID        string  `json:"id"`
-	PostID    string  `json:"post_id"`
-	RepliesTo string  `json:"replies_to"`
+	ID        uint64  `json:"id"`
+	PostID    uint64  `json:"post_id"`
+	RepliesTo uint64  `json:"replies_to"`
 	Text      string  `json:"text"`
 	CreatedAt string  `json:"createdAt"`
 	UpdatedAt *string `json:"updatedAt,omitempty"`
@@ -15,8 +15,8 @@ type Mutation struct {
 }
 
 type NewComment struct {
-	PostID    string `json:"post_id"`
-	RepliesTo string `json:"replies_to"`
+	PostID    uint64 `json:"post_id"`
+	RepliesTo uint64 `json:"replies_to"`
 	Text      string `json:"text"`
 }
 
@@ -33,7 +33,7 @@ type NewUser struct {
 }
 
 type Post struct {
-	ID              string  `json:"id"`
+	ID              uint64  `json:"id"`
 	Name            string  `json:"name"`
 	Description     *string `json:"description,omitempty"`
 	Content         string  `json:"content"`

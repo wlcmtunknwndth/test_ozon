@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"context"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 	"io"
@@ -8,7 +9,12 @@ import (
 	"time"
 )
 
-func MarshallID(id uint64) graphql.Marshaler {
+const (
+	usernameKey = "username"
+	isAdmin     = "isadmin"
+)
+
+func MarshalID(id uint64) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
 		_, err := io.WriteString(w, strconv.Quote(fmt.Sprintf("%d", id)))
 		if err != nil {
@@ -42,4 +48,18 @@ func UnmarshalTimestamp(v any) (time.Time, error) {
 		return time.Parse(time.RFC3339, timeStr)
 	}
 	return time.Time{}, fmt.Errorf("wrong timestamp: need RFC3339")
+}
+
+func GetUsername(ctx context.Context) (string, bool) {
+	username, ok := ctx.Value(usernameKey).(string)
+	return username, ok
+}
+
+func GetAdminPermissions(ctx context.Context) bool {
+	res, ok := ctx.Value(isAdmin).(bool)
+	if !ok {
+		return false
+	} else {
+		return res
+	}
 }

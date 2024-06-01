@@ -18,11 +18,12 @@ type Info struct {
 }
 
 const (
-	access             = "access"
-	ttlToken           = 4 * time.Minute
-	statusUnauthorized = "Unauthorized"
-	statusBadRequest   = "Bad request"
-	authEnv            = "auth_key"
+	access              = "access"
+	ttlToken            = 4 * time.Minute
+	statusUnauthorized  = "Unauthorized"
+	statusBadRequest    = "Bad request"
+	authEnv             = "auth_key"
+	internalServerError = "Internal Server Error"
 )
 
 func checkRequest(r *http.Request) (*Info, error) {
