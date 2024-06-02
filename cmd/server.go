@@ -1,8 +1,8 @@
 package main
 
 import (
+	//. "github.com/99designs/gqlgen"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/wlcmtunknwndth/test_ozon/graph"
@@ -23,6 +23,14 @@ func main() {
 	router.Use(middleware.URLFormat)
 	router.Use(middleware.Logger)
 
+	srv := &http.Server{
+		Addr:         cfg.Server.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.Server.Timeout,
+		WriteTimeout: cfg.Server.Timeout,
+		IdleTimeout:  cfg.Server.IdleTimeout,
+	}
+
 	var pg *postgres.Storage
 	if cfg.UseDB {
 		var err error
@@ -31,6 +39,7 @@ func main() {
 			slog.Error("couldn't run storage", slogAttr.SlogErr("main", err))
 			return
 		}
+		slog.Info("initialized postgres")
 	}
 
 	authService := auth.Auth{Db: pg}
@@ -43,16 +52,9 @@ func main() {
 	gql := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Storage: pg}}))
 
 	//http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	////http.Handle("/query", srv)
-	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	//http.Handle("/query", srv)
+	//router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", gql)
-	srv := http.Server{
-		Addr:         cfg.Server.Address,
-		Handler:      router,
-		ReadTimeout:  cfg.Server.Timeout,
-		WriteTimeout: cfg.Server.Timeout,
-		IdleTimeout:  cfg.Server.IdleTimeout,
-	}
 
 	slog.Info("connect to server for GraphQL playground", slogAttr.SlogInfo("address", cfg.Server.Address))
 	//log.Fatal(http.ListenAndServe(cfg.Server.Address, nil))

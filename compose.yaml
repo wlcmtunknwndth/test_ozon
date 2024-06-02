@@ -4,7 +4,8 @@ services:
       context: .
       target: final
     environment:
-      - config_path =/var/service_config/config.yaml
+      - config_path=/bin/config.yaml
+      - auth_key=ozontest2024
     ports:
       - "63342:63342"
     depends_on:
@@ -24,13 +25,12 @@ services:
       - PGUSER=postgres
     ports:
       - "5432:5432"
-    networks: ["service"]
+#    networks: ["server"]
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 5s
       timeout: 5s
       retries: 3
-
 volumes:
   db:
     driver: local

@@ -5,8 +5,8 @@ CREATE TABLE public.posts(
     description VARCHAR(1024) NOT NULL,
     content text NOT NULL,
     comments_allowed boolean DEFAULT TRUE,
-    createdAt timestampz,
-    updatedAt timestampz
+    createdAt timestamptz,
+    updatedAt timestamptz
 );
 
 CREATE TABLE public.comments(
@@ -15,9 +15,9 @@ CREATE TABLE public.comments(
     post_id BIGINT CHECK(post_id > 0),
     replies_to BIGINT CHECK(replies_to > 0),
     text VARCHAR(2048) NOT NULL,
-    createdAt timestampz,
-    updatedAt timestampz,
-    FOREIGN KEY post_id REFERENCES posts(id)
+    createdAt timestamptz,
+    updatedAt timestamptz,
+    FOREIGN KEY (post_id) REFERENCES posts(id)
 );
 
 CREATE TABLE public.auth(
@@ -26,5 +26,5 @@ CREATE TABLE public.auth(
     isadmin boolean DEFAULT FALSE
 );
 
-INSERT INTO auth(username, password, isadmin) VALUES("admin", "admin", TRUE);
-INSERT INTO auth(username, password, isadmin) VALUES("user", "user", FALSE);
+INSERT INTO auth(username, password, isadmin) VALUES('admin', 'admin', TRUE);
+INSERT INTO auth(username, password, isadmin) VALUES('user', 'user', FALSE);

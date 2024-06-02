@@ -26,8 +26,8 @@ RUN --mount=type=cache,target=/var/cache/apk \
 ARG UID=10001
 USER root
 
-COPY --from=build /bin/server /bin/
-COPY ./config/config.yaml /var/service_config/
+COPY --from=build /bin/server /bin
+COPY ./config/config.yaml /bin
 
 EXPOSE 63342
 

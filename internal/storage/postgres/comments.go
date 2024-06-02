@@ -27,7 +27,7 @@ func (s *Storage) CreateComment(ctx context.Context, username string, comment *m
 	return id, nil
 }
 
-func (s *Storage) GetComments(ctx context.Context, postId uint64) ([]model.Comment, error) {
+func (s *Storage) GetComments(ctx context.Context, postId uint64) ([]*model.Comment, error) {
 	const op = "internal.storage.postgres.GetComments"
 
 	newCtx, cancel := context.WithTimeout(ctx, timeToAnswer)
@@ -38,7 +38,7 @@ func (s *Storage) GetComments(ctx context.Context, postId uint64) ([]model.Comme
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var comments []model.Comment
+	var comments []*model.Comment
 	var ch = make(chan *sql.Rows)
 	var mtx sync.Mutex
 	mtx.Unlock()
@@ -58,7 +58,7 @@ func (s *Storage) GetComments(ctx context.Context, postId uint64) ([]model.Comme
 					mtx.Unlock()
 					continue
 				}
-				comments = append(comments, comment)
+				comments = append(comments, &comment)
 				mtx.Unlock()
 			}
 		}

@@ -31,7 +31,7 @@ func (s *Storage) CreatePost(ctx context.Context, username string, post *model.N
 	return id, nil
 }
 
-func (s *Storage) GetPosts(ctx context.Context, limit, offset int) ([]model.Post, error) {
+func (s *Storage) GetPosts(ctx context.Context, limit, offset int) ([]*model.Post, error) {
 	const op = "internal.storage.postgres.getPosts"
 
 	newCtx, cancel := context.WithTimeout(ctx, timeToAnswer)
@@ -42,7 +42,7 @@ func (s *Storage) GetPosts(ctx context.Context, limit, offset int) ([]model.Post
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var posts = make([]model.Post, 0, limit)
+	var posts = make([]*model.Post, 0, limit)
 	var ch = make(chan *sql.Rows)
 	var mtx sync.Mutex
 	go func() {
@@ -60,7 +60,7 @@ func (s *Storage) GetPosts(ctx context.Context, limit, offset int) ([]model.Post
 					mtx.Unlock()
 					continue
 				}
-				posts = append(posts, post)
+				posts = append(posts, &post)
 				mtx.Unlock()
 			}
 		}

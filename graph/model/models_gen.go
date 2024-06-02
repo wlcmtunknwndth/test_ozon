@@ -54,5 +54,5 @@ type Query struct {
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	IsAdmin  bool   `json:"isAdmin"`
+	IsAdmin  *bool  `json:"isAdmin,omitempty"`
 }

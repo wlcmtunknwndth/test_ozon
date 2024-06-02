@@ -6,7 +6,7 @@ type Post{
     content: String!
     comments_allowed: Boolean!
     createdAt: Timestamp!
-    updatedAt: Timestamp
+    updatedAt: Timestamp!
 }
 
 type Comment{
@@ -17,7 +17,7 @@ type Comment{
     author: String!
     text: String!
     createdAt: Timestamp!
-    updatedAt: Timestamp
+    updatedAt: Timestamp!
 }
 
 type User{
@@ -45,10 +45,8 @@ input NewUser{
 }
 
 type Mutation{
-    createPost(input: NewPost): Post!
-    createComment(input: NewComment): Comment!
-#    createUser(input: NewUser): User!
-#    loginUser(input: NewUser): User!
+    createPost(input: NewPost): ID!
+    createComment(input: NewComment): ID!
 }
 
 type Query{

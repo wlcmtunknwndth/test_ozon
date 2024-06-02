@@ -68,7 +68,7 @@ func (a *Auth) LogIn(w http.ResponseWriter, r *http.Request) {
 	const op = "auth.auth.Login"
 	//corsSkip.EnableCors(w, r)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx, cancel := context.WithTimeout(r.Context(), 2*time.Minute)
 	defer cancel()
 
 	var usr model.User
