@@ -37,7 +37,7 @@ func (r *queryResolver) Posts(ctx context.Context, limit *int, offset *int) ([]*
 }
 
 // Comments is the resolver for the Comments field.
-func (r *queryResolver) Comments(ctx context.Context, postID *string) ([]*model.Comment, error) {
+func (r *queryResolver) Comments(ctx context.Context, postID *uint64) ([]*model.Comment, error) {
 	panic(fmt.Errorf("not implemented: Comments - Comments"))
 }
 

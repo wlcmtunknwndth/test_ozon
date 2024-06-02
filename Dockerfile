@@ -29,7 +29,7 @@ USER root
 COPY --from=build /bin/server /bin/
 COPY ./config/config.yaml /var/service_config/
 
-EXPOSE 8888
+EXPOSE 63342
 
 # What the container should run when it is started.
 ENTRYPOINT [ "/bin/server" ]

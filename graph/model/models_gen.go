@@ -2,13 +2,18 @@
 
 package model
 
+import (
+	"time"
+)
+
 type Comment struct {
-	ID        uint64  `json:"id"`
-	PostID    uint64  `json:"post_id"`
-	RepliesTo uint64  `json:"replies_to"`
-	Text      string  `json:"text"`
-	CreatedAt string  `json:"createdAt"`
-	UpdatedAt *string `json:"updatedAt,omitempty"`
+	ID        uint64     `json:"id"`
+	PostID    uint64     `json:"post_id"`
+	RepliesTo uint64     `json:"replies_to"`
+	Author    string     `json:"author"`
+	Text      string     `json:"text"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
 type Mutation struct {
@@ -33,13 +38,14 @@ type NewUser struct {
 }
 
 type Post struct {
-	ID              uint64  `json:"id"`
-	Name            string  `json:"name"`
-	Description     *string `json:"description,omitempty"`
-	Content         string  `json:"content"`
-	CommentsAllowed bool    `json:"comments_allowed"`
-	CreatedAt       string  `json:"createdAt"`
-	UpdatedAt       *string `json:"updatedAt,omitempty"`
+	ID              uint64     `json:"id"`
+	Author          string     `json:"author"`
+	Name            string     `json:"name"`
+	Description     *string    `json:"description,omitempty"`
+	Content         string     `json:"content"`
+	CommentsAllowed bool       `json:"comments_allowed"`
+	CreatedAt       time.Time  `json:"createdAt"`
+	UpdatedAt       *time.Time `json:"updatedAt,omitempty"`
 }
 
 type Query struct {

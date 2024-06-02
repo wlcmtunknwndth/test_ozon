@@ -27,7 +27,6 @@ type User{
 }
 
 input NewPost{
-    author: String!
     name: String!
     description: String
     content: String!
@@ -35,7 +34,6 @@ input NewPost{
 }
 
 input NewComment{
-    author: String!
     post_id: ID!
     replies_to: ID!
     text: String!
@@ -49,8 +47,8 @@ input NewUser{
 type Mutation{
     createPost(input: NewPost): Post!
     createComment(input: NewComment): Comment!
-    createUser(input: NewUser): User!
-    loginUser(input: NewUser): User!
+#    createUser(input: NewUser): User!
+#    loginUser(input: NewUser): User!
 }
 
 type Query{

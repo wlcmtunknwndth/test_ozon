@@ -2,8 +2,11 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/wlcmtunknwndth/test_ozon/graph/model"
+	"github.com/wlcmtunknwndth/test_ozon/lib/slogAttr"
+	"log/slog"
 	"sync"
 	"time"
 )
@@ -28,7 +31,7 @@ func (s *Storage) CreatePost(ctx context.Context, username string, post *model.N
 	return id, nil
 }
 
-func (s *Storage) getPosts(ctx context.Context, limit, offset int) ([]model.Post, error) {
+func (s *Storage) GetPosts(ctx context.Context, limit, offset int) ([]model.Post, error) {
 	const op = "internal.storage.postgres.getPosts"
 
 	newCtx, cancel := context.WithTimeout(ctx, timeToAnswer)
@@ -40,31 +43,32 @@ func (s *Storage) getPosts(ctx context.Context, limit, offset int) ([]model.Post
 	}
 
 	var posts = make([]model.Post, 0, limit)
-	var wg sync.WaitGroup
-	for rows.Next(){
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			var post model.Post
-			rows.Scan(&post.ID, &post.)
+	var ch = make(chan *sql.Rows)
+	var mtx sync.Mutex
+	go func() {
+		defer mtx.Unlock()
+		for {
+			select {
+			case rows, opened := <-ch:
+				if !opened {
+					return
+				}
+				var post model.Post
+				err = rows.Scan(&post.ID, &post.Author, &post.Name, &post.Description, &post.Content, &post.CommentsAllowed, &post.CreatedAt, &post.UpdatedAt)
+				if err != nil {
+					slog.Error("couldn't scan post for posts request", slogAttr.SlogErr(op, err))
+					mtx.Unlock()
+					continue
+				}
+				posts = append(posts, post)
+				mtx.Unlock()
+			}
+		}
+	}()
 
-		}()
-		wg.Wait()
+	for rows.Next() {
+		ch <- rows
+		mtx.Lock()
 	}
-}
-
-func (s *Storage) CreateComment(ctx context.Context, username string, comment *model.NewComment) (uint64, error) {
-	const op = "internal.storage.postgres.CreateComment"
-	newCtx, cancel := context.WithTimeout(ctx, timeToAnswer)
-	defer cancel()
-
-	var id uint64
-	if err := s.driver.QueryRowContext(newCtx, createComment, username, comment.PostID,
-		comment.RepliesTo, comment.Text,
-		time.Now().Format(time.RFC3339)).
-		Scan(&id); err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
-	}
-
-	return id, nil
+	return posts, nil
 }
