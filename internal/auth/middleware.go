@@ -7,10 +7,14 @@ import (
 	"net/http"
 )
 
+type username string
+type isAdmin string
+type isRegistered string
+
 const (
-	usernameKey   = "user"
-	adminKey      = "isadmin"
-	registeredKey = "isregistered"
+	user         = username("username")
+	isadmin      = isAdmin("isadmin")
+	isregistered = isRegistered("isregistered")
 )
 
 func (a *Auth) MiddlewareAuth() func(handler http.Handler) http.Handler {
@@ -22,38 +26,38 @@ func (a *Auth) MiddlewareAuth() func(handler http.Handler) http.Handler {
 			if err != nil {
 				slog.Error("couldn't validate jwt token", slogAttr.SlogErr(op, err))
 				//httpResponse.Write(w, http.StatusUnauthorized, unauthorized)
-				r = r.WithContext(context.WithValue(r.Context(), registeredKey, false))
+				r = r.WithContext(context.WithValue(r.Context(), isregistered, false))
 				return
 			}
+			ctx := context.WithValue(r.Context(), isregistered, true)
+			ctx = context.WithValue(r.Context(), isadmin, info.IsAdmin)
+			ctx = context.WithValue(r.Context(), user, info.Username)
 
-			ctx := context.WithValue(r.Context(), usernameKey, info.Username)
-			ctx = context.WithValue(ctx, registeredKey, true)
-			ctx = context.WithValue(ctx, adminKey, info.IsAdmin)
 			r = r.WithContext(ctx)
 		})
 	}
 }
 
 func GetUsername(ctx context.Context) string {
-	username, ok := ctx.Value(usernameKey).(string)
+	data, ok := ctx.Value(user).(string)
 	if !ok {
 		return ""
 	}
-	return username
+	return data
 }
 
 func HasAdminRights(ctx context.Context) bool {
-	ans, ok := ctx.Value(adminKey).(bool)
+	data, ok := ctx.Value(isadmin).(bool)
 	if !ok {
 		return false
 	}
-	return ans
+	return data
 }
 
 func IsRegistered(ctx context.Context) bool {
-	ans, ok := ctx.Value(registeredKey).(bool)
+	data, ok := ctx.Value(isregistered).(bool)
 	if !ok {
 		return false
 	}
-	return ans
+	return data
 }

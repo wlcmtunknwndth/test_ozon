@@ -1,7 +1,6 @@
 package main
 
 import (
-	//. "github.com/99designs/gqlgen"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"

@@ -7,13 +7,13 @@ import (
 )
 
 type Comment struct {
-	ID        uint64     `json:"id"`
-	PostID    uint64     `json:"post_id"`
-	RepliesTo uint64     `json:"replies_to"`
-	Author    string     `json:"author"`
-	Text      string     `json:"text"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	ID        uint64    `json:"id"`
+	PostID    uint64    `json:"post_id"`
+	RepliesTo uint64    `json:"replies_to"`
+	Author    string    `json:"author"`
+	Text      string    `json:"text"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 }
 
 type Mutation struct {
@@ -26,10 +26,10 @@ type NewComment struct {
 }
 
 type NewPost struct {
-	Name            string  `json:"name"`
-	Description     *string `json:"description,omitempty"`
-	Content         string  `json:"content"`
-	CommentsAllowed bool    `json:"comments_allowed"`
+	Name            string `json:"name"`
+	Description     string `json:"description,omitempty"`
+	Content         string `json:"content"`
+	CommentsAllowed bool   `json:"comments_allowed"`
 }
 
 type NewUser struct {
@@ -38,14 +38,14 @@ type NewUser struct {
 }
 
 type Post struct {
-	ID              uint64     `json:"id"`
-	Author          string     `json:"author"`
-	Name            string     `json:"name"`
-	Description     *string    `json:"description,omitempty"`
-	Content         string     `json:"content"`
-	CommentsAllowed bool       `json:"comments_allowed"`
-	CreatedAt       time.Time  `json:"createdAt"`
-	UpdatedAt       *time.Time `json:"updatedAt,omitempty"`
+	ID              uint64    `json:"id"`
+	Author          string    `json:"author"`
+	Name            string    `json:"name"`
+	Description     string    `json:"description,omitempty"`
+	Content         string    `json:"content"`
+	CommentsAllowed bool      `json:"comments_allowed"`
+	CreatedAt       time.Time `json:"createdAt"`
+	UpdatedAt       time.Time `json:"updatedAt,omitempty"`
 }
 
 type Query struct {
@@ -54,5 +54,5 @@ type Query struct {
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	IsAdmin  *bool  `json:"isAdmin,omitempty"`
+	IsAdmin  bool   `json:"isAdmin,omitempty"`
 }
