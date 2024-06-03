@@ -14,6 +14,12 @@ require (
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/arriqaaq/aol v0.1.2 // indirect
+	github.com/arriqaaq/art v0.1.2 // indirect
+	github.com/arriqaaq/flashdb v0.1.6 // indirect
+	github.com/arriqaaq/hash v0.1.2 // indirect
+	github.com/arriqaaq/set v0.1.2 // indirect
+	github.com/arriqaaq/zset v0.1.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
