@@ -2,23 +2,22 @@ package inmemory
 
 import (
 	"github.com/arriqaaq/flashdb"
-	"github.com/wlcmtunknwndth/test_ozon/graph/model"
 	"sync"
+	"sync/atomic"
 )
 
 type comments struct {
-	storage map[string]model.Comment
-	mtx     sync.RWMutex
+	storage sync.Map
+	counter atomic.Uint64
 }
 
 type posts struct {
-	storage map[string]model.Post
-	mtx     sync.RWMutex
+	storage sync.Map
+	counter atomic.Uint64
 }
 
 type users struct {
-	storage map[string]model.User
-	mtx     sync.RWMutex
+	storage sync.Map
 }
 
 type Storage struct {
