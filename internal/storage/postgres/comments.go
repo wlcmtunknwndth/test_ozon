@@ -7,7 +7,6 @@ import (
 	"github.com/wlcmtunknwndth/test_ozon/graph/model"
 	"github.com/wlcmtunknwndth/test_ozon/lib/slogAttr"
 	"log/slog"
-	"sync"
 	"time"
 )
 
@@ -16,10 +15,12 @@ func (s *Storage) CreateComment(ctx context.Context, username string, comment *m
 	newCtx, cancel := context.WithTimeout(ctx, timeToAnswer)
 	defer cancel()
 
+	timeNow := time.Now().Format(time.RFC3339)
+
 	var id uint64
 	if err := s.driver.QueryRowContext(newCtx, createComment, username, comment.PostID,
 		comment.RepliesTo, comment.Text,
-		time.Now().Format(time.RFC3339)).
+		timeNow, timeNow).
 		Scan(&id); err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
@@ -40,10 +41,8 @@ func (s *Storage) GetComments(ctx context.Context, postId uint64) ([]*model.Comm
 
 	var comments []*model.Comment
 	var ch = make(chan *sql.Rows)
-	var mtx sync.Mutex
-	mtx.Unlock()
+	var doneCh = make(chan struct{})
 	go func() {
-		defer mtx.Unlock()
 		for {
 			select {
 			case row, opened := <-ch:
@@ -55,18 +54,19 @@ func (s *Storage) GetComments(ctx context.Context, postId uint64) ([]*model.Comm
 					&comment.PostID, &comment.RepliesTo, &comment.Text,
 					&comment.CreatedAt, &comment.UpdatedAt); err != nil {
 					slog.Error("couldn't scan comment", slogAttr.SlogErr(op, err))
-					mtx.Unlock()
+					doneCh <- struct{}{}
 					continue
 				}
 				comments = append(comments, &comment)
-				mtx.Unlock()
+				doneCh <- struct{}{}
 			}
 		}
 	}()
 	for rows.Next() {
 		ch <- rows
-		mtx.Lock()
+		<-doneCh
 	}
 	close(ch)
+	close(doneCh)
 	return comments, nil
 }

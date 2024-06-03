@@ -7,7 +7,6 @@ import (
 	"github.com/wlcmtunknwndth/test_ozon/graph/model"
 	"github.com/wlcmtunknwndth/test_ozon/lib/slogAttr"
 	"log/slog"
-	"sync"
 	"time"
 )
 
@@ -21,9 +20,11 @@ func (s *Storage) CreatePost(ctx context.Context, username string, post *model.N
 	defer cancel()
 	var id uint64
 
+	timeNow := time.Now().Format(time.RFC3339)
+
 	if err := s.driver.QueryRowContext(newCtx, createPost,
 		username, post.Name, post.Description, post.Content,
-		post.CommentsAllowed, time.Now().Format(time.RFC3339)).
+		post.CommentsAllowed, timeNow, timeNow).
 		Scan(&id); err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
@@ -44,9 +45,8 @@ func (s *Storage) GetPosts(ctx context.Context, limit, offset int) ([]*model.Pos
 
 	var posts = make([]*model.Post, 0, limit)
 	var ch = make(chan *sql.Rows)
-	var mtx sync.Mutex
+	var doneCh = make(chan struct{})
 	go func() {
-		defer mtx.Unlock()
 		for {
 			select {
 			case rows, opened := <-ch:
@@ -57,18 +57,20 @@ func (s *Storage) GetPosts(ctx context.Context, limit, offset int) ([]*model.Pos
 				err = rows.Scan(&post.ID, &post.Author, &post.Name, &post.Description, &post.Content, &post.CommentsAllowed, &post.CreatedAt, &post.UpdatedAt)
 				if err != nil {
 					slog.Error("couldn't scan post for posts request", slogAttr.SlogErr(op, err))
-					mtx.Unlock()
+					doneCh <- struct{}{}
 					continue
 				}
 				posts = append(posts, &post)
-				mtx.Unlock()
+				doneCh <- struct{}{}
 			}
 		}
 	}()
 
 	for rows.Next() {
 		ch <- rows
-		mtx.Lock()
+		<-doneCh
 	}
+	close(ch)
+	close(doneCh)
 	return posts, nil
 }

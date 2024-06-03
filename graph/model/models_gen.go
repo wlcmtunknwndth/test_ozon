@@ -13,7 +13,7 @@ type Comment struct {
 	Author    string    `json:"author"`
 	Text      string    `json:"text"`
 	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type Mutation struct {
@@ -27,7 +27,7 @@ type NewComment struct {
 
 type NewPost struct {
 	Name            string `json:"name"`
-	Description     string `json:"description,omitempty"`
+	Description     string `json:"description"`
 	Content         string `json:"content"`
 	CommentsAllowed bool   `json:"comments_allowed"`
 }
@@ -41,11 +41,11 @@ type Post struct {
 	ID              uint64    `json:"id"`
 	Author          string    `json:"author"`
 	Name            string    `json:"name"`
-	Description     string    `json:"description,omitempty"`
+	Description     string    `json:"description"`
 	Content         string    `json:"content"`
 	CommentsAllowed bool      `json:"comments_allowed"`
 	CreatedAt       time.Time `json:"createdAt"`
-	UpdatedAt       time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt       time.Time `json:"updatedAt"`
 }
 
 type Query struct {
@@ -54,5 +54,5 @@ type Query struct {
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	IsAdmin  bool   `json:"isAdmin,omitempty"`
+	IsAdmin  bool   `json:"isAdmin"`
 }

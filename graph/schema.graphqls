@@ -5,8 +5,8 @@ type Post{
     description: String!
     content: String!
     comments_allowed: Boolean!
-    createdAt: Timestamp!
-    updatedAt: Timestamp!
+    createdAt: Time!
+    updatedAt: Time!
 }
 
 type Comment{
@@ -16,8 +16,8 @@ type Comment{
     replies_to: ID!
     author: String!
     text: String!
-    createdAt: Timestamp!
-    updatedAt: Timestamp!
+    createdAt: Time!
+    updatedAt: Time!
 }
 
 type User{
@@ -54,4 +54,4 @@ type Query{
     Comments(post_id: ID): [Comment!]!
 }
 
-scalar Timestamp
+scalar Time

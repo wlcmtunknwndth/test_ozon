@@ -61,6 +61,7 @@ func (a *Auth) Register(w http.ResponseWriter, r *http.Request) {
 		IsAdmin:  false,
 	})
 
+	httpResponse.Write(w, http.StatusOK, authorized)
 	return
 }
 
@@ -98,7 +99,7 @@ func (a *Auth) LogIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	WriteNewToken(w, usr)
-
+	httpResponse.Write(w, http.StatusOK, authorized)
 	return
 }
 

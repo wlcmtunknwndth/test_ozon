@@ -1,7 +1,6 @@
 package graph
 
 import (
-	"context"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 	"io"
@@ -50,16 +49,16 @@ func UnmarshalTimestamp(v any) (time.Time, error) {
 	return time.Time{}, fmt.Errorf("wrong timestamp: need RFC3339")
 }
 
-func GetUsername(ctx context.Context) (string, bool) {
-	username, ok := ctx.Value(usernameKey).(string)
-	return username, ok
-}
-
-func GetAdminPermissions(ctx context.Context) bool {
-	res, ok := ctx.Value(isAdmin).(bool)
-	if !ok {
-		return false
-	} else {
-		return res
-	}
-}
+//func GetUsername(ctx context.Context) (string, bool) {
+//	username, ok := ctx.Value(usernameKey).(string)
+//	return username, ok
+//}
+//
+//func GetAdminPermissions(ctx context.Context) bool {
+//	res, ok := ctx.Value(isAdmin).(bool)
+//	if !ok {
+//		return false
+//	} else {
+//		return res
+//	}
+//}

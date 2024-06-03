@@ -7,39 +7,38 @@ import (
 	"net/http"
 )
 
-type username string
-type isAdmin string
-type isRegistered string
+type key string
 
 const (
-	user         = username("username")
-	isadmin      = isAdmin("isadmin")
-	isregistered = isRegistered("isregistered")
+	extUsername     key = "user"
+	extIsAdmin      key = "isadmin"
+	extIsRegistered key = "isregistered"
 )
 
 func (a *Auth) MiddlewareAuth() func(handler http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			const op = "internal.auth.MiddlewareAuth"
-			defer next.ServeHTTP(w, r)
+
 			info, err := checkRequest(r)
 			if err != nil {
 				slog.Error("couldn't validate jwt token", slogAttr.SlogErr(op, err))
 				//httpResponse.Write(w, http.StatusUnauthorized, unauthorized)
-				r = r.WithContext(context.WithValue(r.Context(), isregistered, false))
+				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), extIsRegistered, false)))
 				return
 			}
-			ctx := context.WithValue(r.Context(), isregistered, true)
-			ctx = context.WithValue(r.Context(), isadmin, info.IsAdmin)
-			ctx = context.WithValue(r.Context(), user, info.Username)
 
-			r = r.WithContext(ctx)
+			ctx := context.WithValue(r.Context(), extIsRegistered, true)
+			ctx = context.WithValue(ctx, extIsAdmin, info.IsAdmin)
+			ctx = context.WithValue(ctx, extUsername, info.Username)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
 }
 
 func GetUsername(ctx context.Context) string {
-	data, ok := ctx.Value(user).(string)
+	data, ok := ctx.Value(extUsername).(string)
 	if !ok {
 		return ""
 	}
@@ -47,7 +46,7 @@ func GetUsername(ctx context.Context) string {
 }
 
 func HasAdminRights(ctx context.Context) bool {
-	data, ok := ctx.Value(isadmin).(bool)
+	data, ok := ctx.Value(extIsAdmin).(bool)
 	if !ok {
 		return false
 	}
@@ -55,8 +54,9 @@ func HasAdminRights(ctx context.Context) bool {
 }
 
 func IsRegistered(ctx context.Context) bool {
-	data, ok := ctx.Value(isregistered).(bool)
+	data, ok := ctx.Value(extIsRegistered).(bool)
 	if !ok {
+		slog.Error("fucked")
 		return false
 	}
 	return data
