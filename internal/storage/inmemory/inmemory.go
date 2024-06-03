@@ -1,7 +1,6 @@
 package inmemory
 
 import (
-	"github.com/arriqaaq/flashdb"
 	"sync"
 	"sync/atomic"
 )
@@ -26,7 +25,7 @@ type Storage struct {
 	users    users
 }
 
-func New(config *flashdb.Config) *Storage {
+func New() *Storage {
 	const op = "internal.storage.inmemory.New"
 	return &Storage{}
 }

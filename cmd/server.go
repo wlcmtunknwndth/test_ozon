@@ -7,6 +7,7 @@ import (
 	"github.com/wlcmtunknwndth/test_ozon/graph"
 	"github.com/wlcmtunknwndth/test_ozon/internal/auth"
 	"github.com/wlcmtunknwndth/test_ozon/internal/config"
+	"github.com/wlcmtunknwndth/test_ozon/internal/storage/inmemory"
 	"github.com/wlcmtunknwndth/test_ozon/internal/storage/postgres"
 	"github.com/wlcmtunknwndth/test_ozon/lib/slogAttr"
 	"log/slog"
@@ -30,33 +31,35 @@ func main() {
 		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
 
-	var pg *postgres.Storage
+	var authService auth.Auth
+	var graphQL graph.Resolver
 	if cfg.UseDB {
-		var err error
-		pg, err = postgres.New(&cfg.DB)
+		pg, err := postgres.New(&cfg.DB)
 		if err != nil {
 			slog.Error("couldn't run storage", slogAttr.SlogErr("main", err))
 			return
 		}
 		slog.Info("initialized postgres")
-	}
+		authService = auth.Auth{Db: pg}
+		graphQL = graph.Resolver{Storage: pg}
+	} else {
+		inMemoryStorage := inmemory.New()
+		authService = auth.Auth{Db: inMemoryStorage}
+		graphQL = graph.Resolver{Storage: inMemoryStorage}
 
-	authService := auth.Auth{Db: pg}
+	}
 	router.Use(authService.MiddlewareAuth())
 	router.Post("/login", authService.LogIn)
 	router.Post("/register", authService.Register)
 	router.Post("/logout", authService.LogOut)
 	router.Post("/delete_user", authService.DeleteUser)
 
-	gql := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{Storage: pg}}))
+	gql := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graphQL}))
 
-	//http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	//http.Handle("/query", srv)
-	//router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", gql)
 
 	slog.Info("connect to server for GraphQL playground", slogAttr.SlogInfo("address", cfg.Server.Address))
-	//log.Fatal(http.ListenAndServe(cfg.Server.Address, nil))
+
 	if err := srv.ListenAndServe(); err != nil {
 		slog.Error("failed to run server", slogAttr.SlogErr("main", err))
 	}
